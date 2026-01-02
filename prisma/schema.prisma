@@ -7,7 +7,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 enum UserRole {
@@ -59,9 +58,9 @@ model User {
 
   products      Product[]
   favorites     Favorite[]
-  sentMessages  Message[]           @relation("MessageSender")
-  chatsAsBuyer  Chat[]              @relation("ChatBuyer")
-  chatsAsSeller Chat[]              @relation("ChatSeller")
+  sentMessages  Message[]      @relation("MessageSender")
+  chatsAsBuyer  Chat[]         @relation("ChatBuyer")
+  chatsAsSeller Chat[]         @relation("ChatSeller")
   reservations  Reservation[]
   reports       Report[]
   notifications Notification[]
@@ -71,12 +70,12 @@ model User {
 }
 
 model Category {
-  id          String       @id @default(uuid())
+  id          String   @id @default(uuid())
   name        String
-  slug        String       @unique
+  slug        String   @unique
   description String?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   subcategories Subcategory[]
   products      Product[]
@@ -93,7 +92,7 @@ model Subcategory {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  category Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   products Product[]
 
   @@unique([categoryId, slug])
@@ -119,20 +118,19 @@ model Product {
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
 
-  category    Category         @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  subcategory Subcategory?     @relation(fields: [subcategoryId], references: [id], onDelete: SetNull)
-  seller      User             @relation(fields: [sellerId], references: [id], onDelete: Cascade)
-  images      ProductImage[]
-  favorites   Favorite[]
-  chats       Chat[]
+  category     Category       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  subcategory  Subcategory?   @relation(fields: [subcategoryId], references: [id], onDelete: SetNull)
+  seller       User           @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  images       ProductImage[]
+  favorites    Favorite[]
+  chats        Chat[]
   reservations Reservation[]
-  reports     Report[]
+  reports      Report[]
 
   @@index([sellerId])
   @@index([categoryId])
   @@index([status])
   @@index([createdAt])
-  @@fulltext([title, description])
   @@map("products")
 }
 
@@ -173,9 +171,9 @@ model Chat {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  product Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  buyer   User     @relation("ChatBuyer", fields: [buyerId], references: [id], onDelete: Cascade)
-  seller  User     @relation("ChatSeller", fields: [sellerId], references: [id], onDelete: Cascade)
+  product  Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  buyer    User      @relation("ChatBuyer", fields: [buyerId], references: [id], onDelete: Cascade)
+  seller   User      @relation("ChatSeller", fields: [sellerId], references: [id], onDelete: Cascade)
   messages Message[]
   reports  Report[]
 
@@ -219,16 +217,16 @@ model Reservation {
 }
 
 model Report {
-  id        String    @id @default(uuid())
-  type      ReportType
+  id         String     @id @default(uuid())
+  type       ReportType
   reporterId String
   productId  String?
   userId     String?
   chatId     String?
   reason     String
-  status     String   @default("PENDING")
-  createdAt  DateTime @default(now())
-  updatedAt DateTime  @updatedAt
+  status     String     @default("PENDING")
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
 
   reporter User     @relation(fields: [reporterId], references: [id], onDelete: Cascade)
   product  Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
@@ -258,13 +256,13 @@ model Notification {
 }
 
 model AdminActionLog {
-  id        String   @id @default(uuid())
-  adminId   String
-  action    String
+  id         String   @id @default(uuid())
+  adminId    String
+  action     String
   targetType String
-  targetId  String
-  details   Json?
-  createdAt DateTime @default(now())
+  targetId   String
+  details    Json?
+  createdAt  DateTime @default(now())
 
   @@index([adminId])
   @@index([targetType, targetId])
@@ -280,7 +278,7 @@ enum AnalyticsEntityType {
 }
 
 model AnalyticsEvent {
-  id         String              @id @default(uuid())
+  id         String               @id @default(uuid())
   eventType  String
   userId     String?
   entityType AnalyticsEntityType?
@@ -288,7 +286,7 @@ model AnalyticsEvent {
   metadata   Json?
   ip         String?
   userAgent  String?
-  createdAt  DateTime            @default(now())
+  createdAt  DateTime             @default(now())
 
   @@index([eventType])
   @@index([userId])
@@ -298,42 +296,41 @@ model AnalyticsEvent {
 }
 
 model AnalyticsDailyStats {
-  id            String   @id @default(uuid())
-  date          DateTime @unique @db.Date
-  totalUsers    Int      @default(0)
-  activeUsers   Int      @default(0)
-  newUsers      Int      @default(0)
-  totalProducts Int      @default(0)
-  activeProducts Int     @default(0)
-  soldProducts  Int      @default(0)
-  totalChats    Int      @default(0)
-  totalMessages Int      @default(0)
-  totalReservations Int  @default(0)
-  totalFavorites Int     @default(0)
-  totalSearches Int      @default(0)
-  totalReports  Int      @default(0)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                String   @id @default(uuid())
+  date              DateTime @unique @db.Date
+  totalUsers        Int      @default(0)
+  activeUsers       Int      @default(0)
+  newUsers          Int      @default(0)
+  totalProducts     Int      @default(0)
+  activeProducts    Int      @default(0)
+  soldProducts      Int      @default(0)
+  totalChats        Int      @default(0)
+  totalMessages     Int      @default(0)
+  totalReservations Int      @default(0)
+  totalFavorites    Int      @default(0)
+  totalSearches     Int      @default(0)
+  totalReports      Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   @@index([date])
   @@map("analytics_daily_stats")
 }
 
 model AnalyticsEntityStats {
-  id         String              @id @default(uuid())
-  entityType AnalyticsEntityType
-  entityId   String
-  views      Int                 @default(0)
-  favorites  Int                 @default(0)
-  messages   Int                 @default(0)
-  reservations Int               @default(0)
-  reports   Int                 @default(0)
-  createdAt  DateTime            @default(now())
-  updatedAt  DateTime            @updatedAt
+  id           String              @id @default(uuid())
+  entityType   AnalyticsEntityType
+  entityId     String
+  views        Int                 @default(0)
+  favorites    Int                 @default(0)
+  messages     Int                 @default(0)
+  reservations Int                 @default(0)
+  reports      Int                 @default(0)
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
 
   @@unique([entityType, entityId])
   @@index([entityType])
   @@index([entityId])
   @@map("analytics_entity_stats")
 }
-
