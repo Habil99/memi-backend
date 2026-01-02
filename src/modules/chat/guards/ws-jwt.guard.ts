@@ -38,4 +38,3 @@ export class WsJwtGuard implements CanActivate {
     return type === 'Bearer' ? token : undefined;
   }
 }
-

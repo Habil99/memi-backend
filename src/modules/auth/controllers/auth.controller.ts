@@ -48,7 +48,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Test endpoint - requires authentication' })
   @ApiResponse({ status: 200, description: 'Authentication successful' })
-  async test(): Promise<{ message: string }> {
+  test(): { message: string } {
     return { message: 'Authentication successful' };
   }
 }

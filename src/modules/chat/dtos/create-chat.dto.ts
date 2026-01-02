@@ -4,4 +4,3 @@ export class CreateChatDto {
   @IsUUID()
   productId: string;
 }
-

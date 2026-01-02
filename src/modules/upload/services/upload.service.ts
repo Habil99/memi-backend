@@ -11,7 +11,8 @@ export class UploadService {
   constructor(private configService: ConfigService) {}
 
   validateFile(file: Express.Multer.File): void {
-    const maxSize = this.configService.get<number>('upload.maxFileSize') || 5242880;
+    const maxSize =
+      this.configService.get<number>('upload.maxFileSize') || 5242880;
     const allowedTypes = this.configService.get<string[]>(
       'upload.allowedMimeTypes',
     ) || ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
@@ -66,4 +67,3 @@ export class UploadService {
     return `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
   }
 }
-

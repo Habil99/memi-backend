@@ -11,4 +11,3 @@ import uploadConfig from './config/upload.config';
   exports: [UploadService],
 })
 export class UploadModule {}
-

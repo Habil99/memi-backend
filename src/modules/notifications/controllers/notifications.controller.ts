@@ -32,8 +32,7 @@ export class NotificationsController {
     @Request() req: { user: Express.User },
     @Query('isRead') isRead?: string,
   ): Promise<INotification[]> {
-    const isReadFilter =
-      isRead !== undefined ? isRead === 'true' : undefined;
+    const isReadFilter = isRead !== undefined ? isRead === 'true' : undefined;
     return this.notificationsService.findByUserId(req.user.id, isReadFilter);
   }
 
@@ -78,7 +77,10 @@ export class NotificationsController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a notification' })
-  @ApiResponse({ status: 200, description: 'Notification deleted successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Notification deleted successfully',
+  })
   @ApiResponse({ status: 404, description: 'Notification not found' })
   async delete(
     @Param('id') id: string,
@@ -91,8 +93,7 @@ export class NotificationsController {
   @Get('test')
   @ApiOperation({ summary: 'Test endpoint' })
   @ApiResponse({ status: 200, description: 'Test successful' })
-  async test(): Promise<{ message: string }> {
+  test(): { message: string } {
     return { message: 'Notifications module is working' };
   }
 }
-

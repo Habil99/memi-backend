@@ -5,4 +5,3 @@ export default registerAs('upload', () => ({
   allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'],
   maxFiles: 8,
 }));
-

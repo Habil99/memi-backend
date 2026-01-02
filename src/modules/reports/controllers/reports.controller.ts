@@ -57,7 +57,10 @@ export class ReportsController {
   @Put(':id/status')
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Update report status (Admin only)' })
-  @ApiResponse({ status: 200, description: 'Report status updated successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Report status updated successfully',
+  })
   @ApiResponse({ status: 403, description: 'Forbidden' })
   async updateStatus(
     @Param('id') id: string,
@@ -70,8 +73,7 @@ export class ReportsController {
   @Get('test')
   @ApiOperation({ summary: 'Test endpoint' })
   @ApiResponse({ status: 200, description: 'Test successful' })
-  async test(): Promise<{ message: string }> {
+  test(): { message: string } {
     return { message: 'Reports module is working' };
   }
 }
-

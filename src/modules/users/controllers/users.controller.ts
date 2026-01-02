@@ -48,7 +48,7 @@ export class UsersController {
   @Get('test')
   @ApiOperation({ summary: 'Test endpoint' })
   @ApiResponse({ status: 200, description: 'Test successful' })
-  async test(): Promise<{ message: string }> {
+  test(): { message: string } {
     return { message: 'Users module is working' };
   }
 

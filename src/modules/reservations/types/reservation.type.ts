@@ -20,4 +20,3 @@ export interface IReservation {
     avatar: string | null;
   };
 }
-

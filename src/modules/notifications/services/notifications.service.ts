@@ -26,7 +26,10 @@ export class NotificationsService {
     return this.mapNotificationToINotification(notification);
   }
 
-  async findByUserId(userId: string, isRead?: boolean): Promise<INotification[]> {
+  async findByUserId(
+    userId: string,
+    isRead?: boolean,
+  ): Promise<INotification[]> {
     const where: { userId: string; isRead?: boolean } = { userId };
     if (isRead !== undefined) {
       where.isRead = isRead;
@@ -92,9 +95,7 @@ export class NotificationsService {
     });
   }
 
-  private mapNotificationToINotification(
-    notification: any,
-  ): INotification {
+  private mapNotificationToINotification(notification: any): INotification {
     return {
       id: notification.id,
       userId: notification.userId,
@@ -107,4 +108,3 @@ export class NotificationsService {
     };
   }
 }
-

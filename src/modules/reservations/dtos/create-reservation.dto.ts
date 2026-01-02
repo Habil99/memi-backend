@@ -4,4 +4,3 @@ export class CreateReservationDto {
   @IsUUID()
   productId: string;
 }
-

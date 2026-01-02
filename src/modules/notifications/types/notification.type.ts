@@ -8,4 +8,3 @@ export interface INotification {
   metadata: Record<string, unknown> | null;
   createdAt: Date;
 }
-

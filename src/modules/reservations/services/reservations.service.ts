@@ -30,9 +30,7 @@ export class ReservationsService {
       throw new BadRequestException('You cannot reserve your own product');
     }
     if (product.status !== ProductStatus.ACTIVE) {
-      throw new BadRequestException(
-        'Product is not available for reservation',
-      );
+      throw new BadRequestException('Product is not available for reservation');
     }
     const existingReservation = await this.prisma.reservation.findFirst({
       where: {
@@ -100,7 +98,10 @@ export class ReservationsService {
         'You can only update reservations for your own products or your own reservations',
       );
     }
-    if (updateReservationDto.status === ReservationStatus.ACCEPTED && !isSeller) {
+    if (
+      updateReservationDto.status === ReservationStatus.ACCEPTED &&
+      !isSeller
+    ) {
       throw new ForbiddenException('Only the seller can accept a reservation');
     }
     if (
@@ -298,4 +299,3 @@ export class ReservationsService {
     };
   }
 }
-

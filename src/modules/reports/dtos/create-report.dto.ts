@@ -1,4 +1,10 @@
-import { IsEnum, IsString, IsUUID, IsOptional, MinLength } from 'class-validator';
+import {
+  IsEnum,
+  IsString,
+  IsUUID,
+  IsOptional,
+  MinLength,
+} from 'class-validator';
 import { ReportType } from '../../../common/types';
 
 export class CreateReportDto {
@@ -21,4 +27,3 @@ export class CreateReportDto {
   @MinLength(10)
   reason: string;
 }
-

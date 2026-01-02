@@ -1,22 +1,21 @@
 import {
+  Body,
   Controller,
   Get,
+  Param,
   Post,
   Put,
-  Param,
-  Body,
-  Query,
   Request,
 } from '@nestjs/common';
 import {
-  ApiTags,
+  ApiBearerAuth,
   ApiOperation,
   ApiResponse,
-  ApiBearerAuth,
+  ApiTags,
 } from '@nestjs/swagger';
-import { ReservationsService } from '../services/reservations.service';
 import { CreateReservationDto } from '../dtos/create-reservation.dto';
 import { UpdateReservationDto } from '../dtos/update-reservation.dto';
+import { ReservationsService } from '../services/reservations.service';
 import { IReservation } from '../types/reservation.type';
 
 @ApiTags('reservations')
@@ -74,7 +73,10 @@ export class ReservationsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get reservation by ID' })
-  @ApiResponse({ status: 200, description: 'Reservation retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Reservation retrieved successfully',
+  })
   @ApiResponse({ status: 404, description: 'Reservation not found' })
   async findById(@Param('id') id: string): Promise<IReservation> {
     return this.reservationsService.findById(id);
@@ -100,8 +102,7 @@ export class ReservationsController {
   @Get('test')
   @ApiOperation({ summary: 'Test endpoint' })
   @ApiResponse({ status: 200, description: 'Test successful' })
-  async test(): Promise<{ message: string }> {
+  test(): { message: string } {
     return { message: 'Reservations module is working' };
   }
 }
-

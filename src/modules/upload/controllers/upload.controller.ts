@@ -134,7 +134,7 @@ export class UploadController {
   @Post('test')
   @ApiOperation({ summary: 'Test endpoint' })
   @ApiResponse({ status: 200, description: 'Test successful' })
-  async test(): Promise<{ message: string }> {
-    return await Promise.resolve({ message: 'Upload module is working' });
+  test(): { message: string } {
+    return { message: 'Upload module is working' };
   }
 }

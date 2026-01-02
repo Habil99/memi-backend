@@ -4,4 +4,3 @@ export interface IUploadResponse {
   mimetype: string;
   size: number;
 }
-

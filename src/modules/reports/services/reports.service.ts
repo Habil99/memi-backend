@@ -13,7 +13,10 @@ import { ReportType } from '../../../common/types';
 export class ReportsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(reporterId: string, createReportDto: CreateReportDto): Promise<IReport> {
+  async create(
+    reporterId: string,
+    createReportDto: CreateReportDto,
+  ): Promise<IReport> {
     this.validateReportTarget(createReportDto);
     const report = await this.prisma.report.create({
       data: {
@@ -102,8 +105,13 @@ export class ReportsService {
   }
 
   private validateReportTarget(createReportDto: CreateReportDto): void {
-    if (createReportDto.type === ReportType.PRODUCT && !createReportDto.productId) {
-      throw new BadRequestException('Product ID is required for product reports');
+    if (
+      createReportDto.type === ReportType.PRODUCT &&
+      !createReportDto.productId
+    ) {
+      throw new BadRequestException(
+        'Product ID is required for product reports',
+      );
     }
     if (createReportDto.type === ReportType.USER && !createReportDto.userId) {
       throw new BadRequestException('User ID is required for user reports');
@@ -135,4 +143,3 @@ export class ReportsService {
     };
   }
 }
-

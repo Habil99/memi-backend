@@ -45,5 +45,3 @@ import { ChatModule } from './modules/chat/chat.module';
   providers: [AppService],
 })
 export class AppModule {}
-
-

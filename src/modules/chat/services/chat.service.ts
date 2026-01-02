@@ -13,7 +13,10 @@ import { IChat, IMessage } from '../types/chat.type';
 export class ChatService {
   constructor(private prisma: PrismaService) {}
 
-  async createChat(userId: string, createChatDto: CreateChatDto): Promise<IChat> {
+  async createChat(
+    userId: string,
+    createChatDto: CreateChatDto,
+  ): Promise<IChat> {
     const product = await this.prisma.product.findUnique({
       where: { id: createChatDto.productId },
       include: { seller: true },
@@ -24,7 +27,9 @@ export class ChatService {
       );
     }
     if (product.sellerId === userId) {
-      throw new BadRequestException('Seller cannot create a chat for their own product');
+      throw new BadRequestException(
+        'Seller cannot create a chat for their own product',
+      );
     }
     const existingChat = await this.prisma.chat.findUnique({
       where: {
@@ -85,7 +90,9 @@ export class ChatService {
       where: { id: createMessageDto.chatId },
     });
     if (!chat) {
-      throw new NotFoundException(`Chat with ID "${createMessageDto.chatId}" not found`);
+      throw new NotFoundException(
+        `Chat with ID "${createMessageDto.chatId}" not found`,
+      );
     }
     if (chat.isBlocked) {
       throw new ForbiddenException('This chat is blocked');
@@ -367,4 +374,3 @@ export class ChatService {
     };
   }
 }
-

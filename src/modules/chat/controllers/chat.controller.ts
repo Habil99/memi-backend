@@ -37,9 +37,7 @@ export class ChatController {
   @Get()
   @ApiOperation({ summary: 'Get all user chats' })
   @ApiResponse({ status: 200, description: 'Chats retrieved successfully' })
-  async getUserChats(
-    @Request() req: { user: Express.User },
-  ): Promise<IChat[]> {
+  async getUserChats(@Request() req: { user: Express.User }): Promise<IChat[]> {
     return this.chatService.getUserChats(req.user.id);
   }
 
@@ -80,8 +78,7 @@ export class ChatController {
   @Get('test')
   @ApiOperation({ summary: 'Test endpoint' })
   @ApiResponse({ status: 200, description: 'Test successful' })
-  async test(): Promise<{ message: string }> {
+  test(): { message: string } {
     return { message: 'Chat module is working' };
   }
 }
-
