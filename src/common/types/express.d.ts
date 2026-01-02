@@ -1,3 +1,5 @@
+/// <reference types="multer" />
+
 import { UserRole } from './index';
 
 declare global {

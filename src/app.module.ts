@@ -8,6 +8,10 @@ import { UsersModule } from './modules/users/users.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { ProductsModule } from './modules/products/products.module';
 import { FavoritesModule } from './modules/favorites/favorites.module';
+import { UploadModule } from './modules/upload/upload.module';
+import { ReservationsModule } from './modules/reservations/reservations.module';
+import { ReportsModule } from './modules/reports/reports.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -18,8 +22,13 @@ import { FavoritesModule } from './modules/favorites/favorites.module';
     CategoriesModule,
     ProductsModule,
     FavoritesModule,
+    UploadModule,
+    ReservationsModule,
+    ReportsModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}
+
