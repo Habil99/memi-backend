@@ -12,12 +12,40 @@ import { CreateProductDto } from '../dtos/create-product.dto';
 import { UpdateProductDto } from '../dtos/update-product.dto';
 import { FilterProductsDto } from '../dtos/filter-products.dto';
 import { IProduct, IPaginatedProducts } from '../types/product.type';
-import { ProductStatus } from '../../../common/types';
+import { ProductStatus, ProductCondition } from '../../../common/types';
 import { AnalyticsService } from '../../analytics/services/analytics.service';
 import {
   AnalyticsEventType,
   AnalyticsEntityType,
 } from '../../analytics/types/analytics-event.type';
+
+type ProductWithRelations = Prisma.ProductGetPayload<{
+  include: {
+    images: true;
+    category: {
+      select: {
+        id: true;
+        name: true;
+        slug: true;
+      };
+    };
+    subcategory: {
+      select: {
+        id: true;
+        name: true;
+        slug: true;
+      };
+    };
+    seller: {
+      select: {
+        id: true;
+        name: true;
+        avatar: true;
+        city: true;
+      };
+    };
+  };
+}>;
 
 @Injectable()
 export class ProductsService {
@@ -107,7 +135,7 @@ export class ProductsService {
         },
       },
     });
-    this.analyticsService.trackEventAsync({
+    void this.analyticsService.trackEventAsync({
       eventType: AnalyticsEventType.PRODUCT_CREATED,
       userId: sellerId,
       entityType: AnalyticsEntityType.PRODUCT,
@@ -294,7 +322,7 @@ export class ProductsService {
       favoriteCount: product._count.favorites,
       isFavorite,
     };
-    this.analyticsService.trackEventAsync(
+    void this.analyticsService.trackEventAsync(
       {
         eventType: AnalyticsEventType.PRODUCT_VIEWED,
         userId,
@@ -442,13 +470,13 @@ export class ProductsService {
     });
   }
 
-  private mapProductToIProduct(product: any): IProduct {
+  private mapProductToIProduct(product: ProductWithRelations): IProduct {
     return {
       id: product.id,
       title: product.title,
       description: product.description,
       price: Number(product.price),
-      condition: product.condition,
+      condition: product.condition as ProductCondition,
       categoryId: product.categoryId,
       subcategoryId: product.subcategoryId,
       size: product.size,
@@ -456,14 +484,14 @@ export class ProductsService {
       brand: product.brand,
       material: product.material,
       location: product.location,
-      status: product.status,
+      status: product.status as ProductStatus,
       sellerId: product.sellerId,
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,
       images: product.images || [],
-      category: product.category,
-      subcategory: product.subcategory,
-      seller: product.seller,
+      category: product.category ?? undefined,
+      subcategory: product.subcategory ?? undefined,
+      seller: product.seller ?? undefined,
     };
   }
 }

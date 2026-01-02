@@ -12,6 +12,8 @@ import {
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
+  ApiParam,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { NotificationsService } from '../services/notifications.service';
 import { INotification } from '../types/notification.type';
@@ -24,9 +26,26 @@ export class NotificationsController {
 
   @Get()
   @ApiOperation({ summary: 'Get user notifications' })
+  @ApiQuery({
+    name: 'isRead',
+    required: false,
+    description: 'Filter by read status',
+    example: 'false',
+    type: String,
+  })
   @ApiResponse({
     status: 200,
     description: 'Notifications retrieved successfully',
+    schema: {
+      example: [
+        {
+          id: '123e4567-e89b-12d3-a456-426614174000',
+          type: 'RESERVATION_CREATED',
+          message: 'New reservation for your product',
+          isRead: false,
+        },
+      ],
+    },
   })
   async getNotifications(
     @Request() req: { user: Express.User },
@@ -41,6 +60,11 @@ export class NotificationsController {
   @ApiResponse({
     status: 200,
     description: 'Unread count retrieved successfully',
+    schema: {
+      example: {
+        count: 5,
+      },
+    },
   })
   async getUnreadCount(
     @Request() req: { user: Express.User },
@@ -51,9 +75,16 @@ export class NotificationsController {
 
   @Put(':id/read')
   @ApiOperation({ summary: 'Mark notification as read' })
+  @ApiParam({ name: 'id', description: 'Notification ID', example: '123e4567-e89b-12d3-a456-426614174000' })
   @ApiResponse({
     status: 200,
     description: 'Notification marked as read',
+    schema: {
+      example: {
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        isRead: true,
+      },
+    },
   })
   @ApiResponse({ status: 404, description: 'Notification not found' })
   async markAsRead(
@@ -68,6 +99,11 @@ export class NotificationsController {
   @ApiResponse({
     status: 200,
     description: 'All notifications marked as read',
+    schema: {
+      example: {
+        count: 5,
+      },
+    },
   })
   async markAllAsRead(
     @Request() req: { user: Express.User },
@@ -77,9 +113,15 @@ export class NotificationsController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a notification' })
+  @ApiParam({ name: 'id', description: 'Notification ID', example: '123e4567-e89b-12d3-a456-426614174000' })
   @ApiResponse({
     status: 200,
     description: 'Notification deleted successfully',
+    schema: {
+      example: {
+        message: 'Notification deleted successfully',
+      },
+    },
   })
   @ApiResponse({ status: 404, description: 'Notification not found' })
   async delete(
@@ -92,7 +134,15 @@ export class NotificationsController {
 
   @Get('test')
   @ApiOperation({ summary: 'Test endpoint' })
-  @ApiResponse({ status: 200, description: 'Test successful' })
+  @ApiResponse({
+    status: 200,
+    description: 'Test successful',
+    schema: {
+      example: {
+        message: 'Notifications module is working',
+      },
+    },
+  })
   test(): { message: string } {
     return { message: 'Notifications module is working' };
   }

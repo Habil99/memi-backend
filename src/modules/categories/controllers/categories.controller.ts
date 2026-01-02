@@ -12,6 +12,8 @@ import {
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
+  ApiParam,
+  ApiBody,
 } from '@nestjs/swagger';
 import { CategoriesService } from '../services/categories.service';
 import { CreateCategoryDto } from '../dtos/create-category.dto';
@@ -35,6 +37,16 @@ export class CategoriesController {
   @ApiResponse({
     status: 200,
     description: 'Categories retrieved successfully',
+    schema: {
+      example: [
+        {
+          id: '123e4567-e89b-12d3-a456-426614174000',
+          name: 'Clothing',
+          slug: 'clothing',
+          description: 'All types of clothing',
+        },
+      ],
+    },
   })
   async findAll(): Promise<ICategory[]> {
     return this.categoriesService.findAll();
@@ -52,7 +64,18 @@ export class CategoriesController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get category by ID' })
-  @ApiResponse({ status: 200, description: 'Category retrieved successfully' })
+  @ApiParam({ name: 'id', description: 'Category ID', example: '123e4567-e89b-12d3-a456-426614174000' })
+  @ApiResponse({
+    status: 200,
+    description: 'Category retrieved successfully',
+    schema: {
+      example: {
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        name: 'Clothing',
+        slug: 'clothing',
+      },
+    },
+  })
   @ApiResponse({ status: 404, description: 'Category not found' })
   async findById(@Param('id') id: string): Promise<ICategory> {
     return this.categoriesService.findById(id);
@@ -60,7 +83,11 @@ export class CategoriesController {
 
   @Get('slug/:slug')
   @ApiOperation({ summary: 'Get category by slug' })
-  @ApiResponse({ status: 200, description: 'Category retrieved successfully' })
+  @ApiParam({ name: 'slug', description: 'Category slug', example: 'clothing' })
+  @ApiResponse({
+    status: 200,
+    description: 'Category retrieved successfully',
+  })
   @ApiResponse({ status: 404, description: 'Category not found' })
   async findBySlug(
     @Param('slug') slug: string,
@@ -72,7 +99,18 @@ export class CategoriesController {
   @ApiBearerAuth()
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Create a new category (Admin only)' })
-  @ApiResponse({ status: 201, description: 'Category created successfully' })
+  @ApiBody({ type: CreateCategoryDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Category created successfully',
+    schema: {
+      example: {
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        name: 'Clothing',
+        slug: 'clothing',
+      },
+    },
+  })
   @ApiResponse({ status: 409, description: 'Category already exists' })
   async create(
     @Body() createCategoryDto: CreateCategoryDto,
@@ -84,7 +122,12 @@ export class CategoriesController {
   @ApiBearerAuth()
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Update a category (Admin only)' })
-  @ApiResponse({ status: 200, description: 'Category updated successfully' })
+  @ApiParam({ name: 'id', description: 'Category ID', example: '123e4567-e89b-12d3-a456-426614174000' })
+  @ApiBody({ type: UpdateCategoryDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Category updated successfully',
+  })
   @ApiResponse({ status: 404, description: 'Category not found' })
   async update(
     @Param('id') id: string,
@@ -97,7 +140,16 @@ export class CategoriesController {
   @ApiBearerAuth()
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Delete a category (Admin only)' })
-  @ApiResponse({ status: 200, description: 'Category deleted successfully' })
+  @ApiParam({ name: 'id', description: 'Category ID', example: '123e4567-e89b-12d3-a456-426614174000' })
+  @ApiResponse({
+    status: 200,
+    description: 'Category deleted successfully',
+    schema: {
+      example: {
+        message: 'Category deleted successfully',
+      },
+    },
+  })
   @ApiResponse({ status: 404, description: 'Category not found' })
   async delete(@Param('id') id: string): Promise<{ message: string }> {
     await this.categoriesService.delete(id);
@@ -108,7 +160,11 @@ export class CategoriesController {
   @ApiBearerAuth()
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Create a new subcategory (Admin only)' })
-  @ApiResponse({ status: 201, description: 'Subcategory created successfully' })
+  @ApiBody({ type: CreateSubcategoryDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Subcategory created successfully',
+  })
   @ApiResponse({ status: 409, description: 'Subcategory already exists' })
   async createSubcategory(
     @Body() createSubcategoryDto: CreateSubcategoryDto,
@@ -120,7 +176,16 @@ export class CategoriesController {
   @ApiBearerAuth()
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Delete a subcategory (Admin only)' })
-  @ApiResponse({ status: 200, description: 'Subcategory deleted successfully' })
+  @ApiParam({ name: 'id', description: 'Subcategory ID', example: '123e4567-e89b-12d3-a456-426614174000' })
+  @ApiResponse({
+    status: 200,
+    description: 'Subcategory deleted successfully',
+    schema: {
+      example: {
+        message: 'Subcategory deleted successfully',
+      },
+    },
+  })
   @ApiResponse({ status: 404, description: 'Subcategory not found' })
   async deleteSubcategory(
     @Param('id') id: string,
@@ -131,7 +196,15 @@ export class CategoriesController {
 
   @Get('test')
   @ApiOperation({ summary: 'Test endpoint' })
-  @ApiResponse({ status: 200, description: 'Test successful' })
+  @ApiResponse({
+    status: 200,
+    description: 'Test successful',
+    schema: {
+      example: {
+        message: 'Categories module is working',
+      },
+    },
+  })
   test(): { message: string } {
     return { message: 'Categories module is working' };
   }

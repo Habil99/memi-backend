@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../../common/services/prisma.service';
 import {
   IAnalyticsEvent,
@@ -24,21 +25,26 @@ export class AnalyticsService {
           userId: event.userId,
           entityType: event.entityType,
           entityId: event.entityId,
-          metadata: event.metadata || null,
+          metadata: event.metadata
+            ? (event.metadata as Prisma.InputJsonValue)
+            : Prisma.JsonNull,
           ip,
           userAgent: request?.userAgent || null,
         },
       });
       await this.updateEntityStats(event);
     } catch (error) {
-      this.logger.error(`Failed to track event: ${error}`, error.stack);
+      this.logger.error(
+        `Failed to track event: ${error}`,
+        (error as Error)?.stack,
+      );
     }
   }
 
-  async trackEventAsync(
+  trackEventAsync(
     event: IAnalyticsEvent,
     request?: { ip?: string; userAgent?: string },
-  ): Promise<void> {
+  ): void {
     setImmediate(() => {
       this.trackEvent(event, request).catch((error) => {
         this.logger.error(`Async event tracking failed: ${error}`);
@@ -100,12 +106,35 @@ export class AnalyticsService {
           data: updateData,
         });
       } else {
+        const createData: {
+          entityType: AnalyticsEntityType;
+          entityId: string;
+          views?: number;
+          favorites?: number;
+          messages?: number;
+          reservations?: number;
+          reports?: number;
+        } = {
+          entityType: event.entityType,
+          entityId: event.entityId,
+        };
+        if (updateData.views) {
+          createData.views = 1;
+        }
+        if (updateData.favorites) {
+          createData.favorites = 1;
+        }
+        if (updateData.messages) {
+          createData.messages = 1;
+        }
+        if (updateData.reservations) {
+          createData.reservations = 1;
+        }
+        if (updateData.reports) {
+          createData.reports = 1;
+        }
         await this.prisma.analyticsEntityStats.create({
-          data: {
-            entityType: event.entityType,
-            entityId: event.entityId,
-            ...updateData,
-          },
+          data: createData,
         });
       }
     } catch (error) {

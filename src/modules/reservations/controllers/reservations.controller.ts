@@ -12,6 +12,8 @@ import {
   ApiOperation,
   ApiResponse,
   ApiTags,
+  ApiParam,
+  ApiBody,
 } from '@nestjs/swagger';
 import { CreateReservationDto } from '../dtos/create-reservation.dto';
 import { UpdateReservationDto } from '../dtos/update-reservation.dto';
@@ -26,7 +28,19 @@ export class ReservationsController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new reservation' })
-  @ApiResponse({ status: 201, description: 'Reservation created successfully' })
+  @ApiBody({ type: CreateReservationDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Reservation created successfully',
+    schema: {
+      example: {
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        productId: '123e4567-e89b-12d3-a456-426614174001',
+        buyerId: '123e4567-e89b-12d3-a456-426614174002',
+        status: 'PENDING',
+      },
+    },
+  })
   @ApiResponse({ status: 400, description: 'Invalid request' })
   async create(
     @Request() req: { user: Express.User },
@@ -40,6 +54,15 @@ export class ReservationsController {
   @ApiResponse({
     status: 200,
     description: 'Reservations retrieved successfully',
+    schema: {
+      example: [
+        {
+          id: '123e4567-e89b-12d3-a456-426614174000',
+          productId: '123e4567-e89b-12d3-a456-426614174001',
+          status: 'PENDING',
+        },
+      ],
+    },
   })
   async getMyReservations(
     @Request() req: { user: Express.User },
@@ -52,6 +75,15 @@ export class ReservationsController {
   @ApiResponse({
     status: 200,
     description: 'Reservations retrieved successfully',
+    schema: {
+      example: [
+        {
+          id: '123e4567-e89b-12d3-a456-426614174000',
+          productId: '123e4567-e89b-12d3-a456-426614174001',
+          status: 'PENDING',
+        },
+      ],
+    },
   })
   async getMySales(
     @Request() req: { user: Express.User },
@@ -61,9 +93,19 @@ export class ReservationsController {
 
   @Get('product/:productId')
   @ApiOperation({ summary: 'Get reservations for a product' })
+  @ApiParam({ name: 'productId', description: 'Product ID', example: '123e4567-e89b-12d3-a456-426614174000' })
   @ApiResponse({
     status: 200,
     description: 'Reservations retrieved successfully',
+    schema: {
+      example: [
+        {
+          id: '123e4567-e89b-12d3-a456-426614174001',
+          productId: '123e4567-e89b-12d3-a456-426614174000',
+          status: 'PENDING',
+        },
+      ],
+    },
   })
   async getByProductId(
     @Param('productId') productId: string,
@@ -73,9 +115,18 @@ export class ReservationsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get reservation by ID' })
+  @ApiParam({ name: 'id', description: 'Reservation ID', example: '123e4567-e89b-12d3-a456-426614174000' })
   @ApiResponse({
     status: 200,
     description: 'Reservation retrieved successfully',
+    schema: {
+      example: {
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        productId: '123e4567-e89b-12d3-a456-426614174001',
+        buyerId: '123e4567-e89b-12d3-a456-426614174002',
+        status: 'PENDING',
+      },
+    },
   })
   @ApiResponse({ status: 404, description: 'Reservation not found' })
   async findById(@Param('id') id: string): Promise<IReservation> {
@@ -84,7 +135,18 @@ export class ReservationsController {
 
   @Put(':id')
   @ApiOperation({ summary: 'Update reservation status' })
-  @ApiResponse({ status: 200, description: 'Reservation updated successfully' })
+  @ApiParam({ name: 'id', description: 'Reservation ID', example: '123e4567-e89b-12d3-a456-426614174000' })
+  @ApiBody({ type: UpdateReservationDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Reservation updated successfully',
+    schema: {
+      example: {
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        status: 'CONFIRMED',
+      },
+    },
+  })
   @ApiResponse({ status: 403, description: 'Forbidden' })
   @ApiResponse({ status: 404, description: 'Reservation not found' })
   async update(
@@ -101,7 +163,15 @@ export class ReservationsController {
 
   @Get('test')
   @ApiOperation({ summary: 'Test endpoint' })
-  @ApiResponse({ status: 200, description: 'Test successful' })
+  @ApiResponse({
+    status: 200,
+    description: 'Test successful',
+    schema: {
+      example: {
+        message: 'Reservations module is working',
+      },
+    },
+  })
   test(): { message: string } {
     return { message: 'Reservations module is working' };
   }

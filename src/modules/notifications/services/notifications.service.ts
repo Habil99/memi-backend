@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../../common/services/prisma.service';
 import { INotification } from '../types/notification.type';
 
@@ -19,7 +20,9 @@ export class NotificationsService {
         type,
         title,
         message,
-        metadata: metadata || null,
+        metadata: metadata
+          ? (metadata as Prisma.InputJsonValue)
+          : Prisma.JsonNull,
         isRead: false,
       },
     });

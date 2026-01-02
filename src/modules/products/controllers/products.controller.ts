@@ -14,6 +14,9 @@ import {
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
+  ApiParam,
+  ApiQuery,
+  ApiBody,
 } from '@nestjs/swagger';
 import { ProductsService } from '../services/products.service';
 import { CreateProductDto } from '../dtos/create-product.dto';
@@ -28,7 +31,30 @@ export class ProductsController {
 
   @Get()
   @ApiOperation({ summary: 'Get all products with filters' })
-  @ApiResponse({ status: 200, description: 'Products retrieved successfully' })
+  @ApiQuery({ type: FilterProductsDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Products retrieved successfully',
+    schema: {
+      example: {
+        data: [
+          {
+            id: '123e4567-e89b-12d3-a456-426614174000',
+            title: 'Vintage Leather Jacket',
+            description: 'Beautiful vintage leather jacket',
+            price: 150.5,
+            condition: 'EXCELLENT',
+            status: 'ACTIVE',
+            sellerId: '123e4567-e89b-12d3-a456-426614174001',
+          },
+        ],
+        total: 100,
+        page: 1,
+        limit: 20,
+        totalPages: 5,
+      },
+    },
+  })
   async findAll(
     @Query() filterDto: FilterProductsDto,
     @Request() req?: { user?: Express.User },
@@ -38,7 +64,24 @@ export class ProductsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get product by ID' })
-  @ApiResponse({ status: 200, description: 'Product retrieved successfully' })
+  @ApiParam({ name: 'id', description: 'Product ID', example: '123e4567-e89b-12d3-a456-426614174000' })
+  @ApiResponse({
+    status: 200,
+    description: 'Product retrieved successfully',
+    schema: {
+      example: {
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        title: 'Vintage Leather Jacket',
+        description: 'Beautiful vintage leather jacket',
+        price: 150.5,
+        condition: 'EXCELLENT',
+        status: 'ACTIVE',
+        sellerId: '123e4567-e89b-12d3-a456-426614174001',
+        images: [],
+        category: { id: '...', name: 'Clothing' },
+      },
+    },
+  })
   @ApiResponse({ status: 404, description: 'Product not found' })
   async findById(
     @Param('id') id: string,
@@ -58,7 +101,21 @@ export class ProductsController {
   @Post()
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new product' })
-  @ApiResponse({ status: 201, description: 'Product created successfully' })
+  @ApiBody({ type: CreateProductDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Product created successfully',
+    schema: {
+      example: {
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        title: 'Vintage Leather Jacket',
+        description: 'Beautiful vintage leather jacket',
+        price: 150.5,
+        condition: 'EXCELLENT',
+        status: 'ACTIVE',
+      },
+    },
+  })
   @ApiResponse({ status: 400, description: 'Invalid input' })
   async create(
     @Request() req: { user: Express.User },
@@ -70,7 +127,19 @@ export class ProductsController {
   @Put(':id')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a product' })
-  @ApiResponse({ status: 200, description: 'Product updated successfully' })
+  @ApiParam({ name: 'id', description: 'Product ID', example: '123e4567-e89b-12d3-a456-426614174000' })
+  @ApiBody({ type: UpdateProductDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Product updated successfully',
+    schema: {
+      example: {
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        title: 'Updated Product Title',
+        price: 200,
+      },
+    },
+  })
   @ApiResponse({ status: 403, description: 'Forbidden - not the owner' })
   @ApiResponse({ status: 404, description: 'Product not found' })
   async update(
@@ -84,7 +153,16 @@ export class ProductsController {
   @Delete(':id')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a product (soft delete)' })
-  @ApiResponse({ status: 200, description: 'Product deleted successfully' })
+  @ApiParam({ name: 'id', description: 'Product ID', example: '123e4567-e89b-12d3-a456-426614174000' })
+  @ApiResponse({
+    status: 200,
+    description: 'Product deleted successfully',
+    schema: {
+      example: {
+        message: 'Product deleted successfully',
+      },
+    },
+  })
   @ApiResponse({ status: 403, description: 'Forbidden - not the owner' })
   @ApiResponse({ status: 404, description: 'Product not found' })
   async delete(
@@ -97,7 +175,15 @@ export class ProductsController {
 
   @Get('test')
   @ApiOperation({ summary: 'Test endpoint' })
-  @ApiResponse({ status: 200, description: 'Test successful' })
+  @ApiResponse({
+    status: 200,
+    description: 'Test successful',
+    schema: {
+      example: {
+        message: 'Products module is working',
+      },
+    },
+  })
   test(): { message: string } | Promise<{ message: string }> {
     return Promise.resolve({ message: 'Products module is working' });
   }

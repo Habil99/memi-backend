@@ -44,3 +44,5 @@ lerna-debug.log*
 
 # Uploads
 /uploads
+
+.pnpm-store

@@ -2,7 +2,7 @@ import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Socket } from 'socket.io';
-import '../../common/types/socket';
+import { IJwtPayload } from '../../auth/strategies/jwt.strategy';
 
 @Injectable()
 export class WsJwtGuard implements CanActivate {
@@ -18,11 +18,11 @@ export class WsJwtGuard implements CanActivate {
       return false;
     }
     try {
-      const payload = await this.jwtService.verifyAsync(token, {
+      const payload: IJwtPayload = await this.jwtService.verifyAsync(token, {
         secret:
           this.configService.get<string>('JWT_SECRET') || 'your-secret-key',
       });
-      client.data.user = payload;
+      (client.data as { user?: IJwtPayload }).user = payload;
       return true;
     } catch {
       return false;

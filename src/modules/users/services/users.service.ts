@@ -6,6 +6,7 @@ import {
 import { PrismaService } from '../../../common/services/prisma.service';
 import { UpdateProfileDto } from '../dtos/update-profile.dto';
 import { IUser, IPublicUser } from '../types/user.type';
+import { UserRole } from '../../../common/types';
 
 @Injectable()
 export class UsersService {
@@ -28,7 +29,10 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException(`User with ID "${id}" not found`);
     }
-    return user;
+    return {
+      ...user,
+      role: user.role as UserRole,
+    };
   }
 
   async getProfile(userId: string): Promise<IUser> {
@@ -53,7 +57,10 @@ export class UsersService {
         createdAt: true,
       },
     });
-    return user;
+    return {
+      ...user,
+      role: user.role as UserRole,
+    };
   }
 
   async getPublicProfile(userId: string): Promise<IPublicUser> {
@@ -91,7 +98,10 @@ export class UsersService {
         createdAt: true,
       },
     });
-    return user;
+    return {
+      ...user,
+      role: user.role as UserRole,
+    };
   }
 
   async unblockUser(adminId: string, userId: string): Promise<IUser> {
@@ -113,6 +123,9 @@ export class UsersService {
         createdAt: true,
       },
     });
-    return user;
+    return {
+      ...user,
+      role: user.role as UserRole,
+    };
   }
 }

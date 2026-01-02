@@ -57,7 +57,7 @@ export class AuthService {
       email: user.email,
       role: user.role,
     });
-    this.analyticsService.trackEventAsync({
+    void this.analyticsService.trackEventAsync({
       eventType: AnalyticsEventType.USER_REGISTERED,
       userId: user.id,
       entityType: AnalyticsEntityType.USER,
@@ -77,7 +77,7 @@ export class AuthService {
       where: { email: loginDto.email },
     });
     if (!user) {
-      this.analyticsService.trackEventAsync(
+      void this.analyticsService.trackEventAsync(
         {
           eventType: AnalyticsEventType.LOGIN_FAILED,
           metadata: { email: loginDto.email },
@@ -87,7 +87,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
     if (user.isBlocked) {
-      this.analyticsService.trackEventAsync(
+      void this.analyticsService.trackEventAsync(
         {
           eventType: AnalyticsEventType.LOGIN_FAILED,
           userId: user.id,
@@ -102,7 +102,7 @@ export class AuthService {
       user.password,
     );
     if (!isPasswordValid) {
-      this.analyticsService.trackEventAsync(
+      void this.analyticsService.trackEventAsync(
         {
           eventType: AnalyticsEventType.LOGIN_FAILED,
           userId: user.id,
@@ -116,7 +116,7 @@ export class AuthService {
       email: user.email,
       role: user.role,
     });
-    this.analyticsService.trackEventAsync({
+    void this.analyticsService.trackEventAsync({
       eventType: AnalyticsEventType.USER_LOGGED_IN,
       userId: user.id,
       entityType: AnalyticsEntityType.USER,
@@ -134,8 +134,9 @@ export class AuthService {
   }
 
   async refreshToken(refreshToken: string): Promise<{ accessToken: string }> {
+    let payload: IJwtPayload | undefined;
     try {
-      const payload = this.jwtService.verify<IJwtPayload>(refreshToken, {
+      payload = this.jwtService.verify<IJwtPayload>(refreshToken, {
         secret:
           this.configService.get<string>('JWT_REFRESH_SECRET') ||
           'your-refresh-secret',
@@ -160,7 +161,8 @@ export class AuthService {
       );
       return { accessToken: newAccessToken };
     } catch (error) {
-      this.analyticsService.trackEventAsync({
+      console.error(error);
+      void this.analyticsService.trackEventAsync({
         eventType: AnalyticsEventType.UNAUTHORIZED_ACTION_ATTEMPT,
         userId: payload?.sub,
       });

@@ -12,6 +12,7 @@ import {
   AnalyticsEventType,
   AnalyticsEntityType,
 } from '../../analytics/types/analytics-event.type';
+import { ProductCondition, ProductStatus } from '../../../common/types';
 
 @Injectable()
 export class FavoritesService {
@@ -45,7 +46,7 @@ export class FavoritesService {
         productId,
       },
     });
-    this.analyticsService.trackEventAsync({
+    void this.analyticsService.trackEventAsync({
       eventType: AnalyticsEventType.FAVORITE_ADDED,
       userId,
       entityType: AnalyticsEntityType.PRODUCT,
@@ -73,7 +74,7 @@ export class FavoritesService {
         },
       },
     });
-    this.analyticsService.trackEventAsync({
+    void this.analyticsService.trackEventAsync({
       eventType: AnalyticsEventType.FAVORITE_REMOVED,
       userId,
       entityType: AnalyticsEntityType.PRODUCT,
@@ -127,7 +128,7 @@ export class FavoritesService {
       title: favorite.product.title,
       description: favorite.product.description,
       price: Number(favorite.product.price),
-      condition: favorite.product.condition,
+      condition: favorite.product.condition as ProductCondition,
       categoryId: favorite.product.categoryId,
       subcategoryId: favorite.product.subcategoryId,
       size: favorite.product.size,
@@ -135,7 +136,7 @@ export class FavoritesService {
       brand: favorite.product.brand,
       material: favorite.product.material,
       location: favorite.product.location,
-      status: favorite.product.status,
+      status: favorite.product.status as ProductStatus,
       sellerId: favorite.product.sellerId,
       createdAt: favorite.product.createdAt,
       updatedAt: favorite.product.updatedAt,
@@ -145,7 +146,7 @@ export class FavoritesService {
         order: img.order,
       })),
       category: favorite.product.category,
-      subcategory: favorite.product.subcategory,
+      subcategory: favorite.product.subcategory ?? undefined,
       seller: favorite.product.seller,
       favoriteCount: favorite.product._count.favorites,
       isFavorite: true,
