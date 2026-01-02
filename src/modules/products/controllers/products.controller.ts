@@ -42,9 +42,17 @@ export class ProductsController {
   @ApiResponse({ status: 404, description: 'Product not found' })
   async findById(
     @Param('id') id: string,
-    @Request() req?: { user?: Express.User },
+    @Request()
+    req?: {
+      user?: Express.User;
+      ip?: string;
+      headers?: { 'user-agent'?: string };
+    },
   ): Promise<IProduct> {
-    return this.productsService.findById(id, req?.user?.id);
+    return this.productsService.findById(id, req?.user?.id, {
+      ip: req?.ip,
+      userAgent: req?.headers?.['user-agent'],
+    });
   }
 
   @Post()

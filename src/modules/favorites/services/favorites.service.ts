@@ -2,13 +2,24 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { PrismaService } from '../../../common/services/prisma.service';
 import { IProduct } from '../../products/types/product.type';
+import { AnalyticsService } from '../../analytics/services/analytics.service';
+import {
+  AnalyticsEventType,
+  AnalyticsEntityType,
+} from '../../analytics/types/analytics-event.type';
 
 @Injectable()
 export class FavoritesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @Inject(forwardRef(() => AnalyticsService))
+    private analyticsService: AnalyticsService,
+  ) {}
 
   async addFavorite(userId: string, productId: string): Promise<void> {
     const product = await this.prisma.product.findUnique({
@@ -34,6 +45,12 @@ export class FavoritesService {
         productId,
       },
     });
+    this.analyticsService.trackEventAsync({
+      eventType: AnalyticsEventType.FAVORITE_ADDED,
+      userId,
+      entityType: AnalyticsEntityType.PRODUCT,
+      entityId: productId,
+    });
   }
 
   async removeFavorite(userId: string, productId: string): Promise<void> {
@@ -55,6 +72,12 @@ export class FavoritesService {
           productId,
         },
       },
+    });
+    this.analyticsService.trackEventAsync({
+      eventType: AnalyticsEventType.FAVORITE_REMOVED,
+      userId,
+      entityType: AnalyticsEntityType.PRODUCT,
+      entityId: productId,
     });
   }
 

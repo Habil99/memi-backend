@@ -272,3 +272,68 @@ model AdminActionLog {
   @@map("admin_action_logs")
 }
 
+enum AnalyticsEntityType {
+  PRODUCT
+  USER
+  CHAT
+  RESERVATION
+}
+
+model AnalyticsEvent {
+  id         String              @id @default(uuid())
+  eventType  String
+  userId     String?
+  entityType AnalyticsEntityType?
+  entityId   String?
+  metadata   Json?
+  ip         String?
+  userAgent  String?
+  createdAt  DateTime            @default(now())
+
+  @@index([eventType])
+  @@index([userId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@map("analytics_events")
+}
+
+model AnalyticsDailyStats {
+  id            String   @id @default(uuid())
+  date          DateTime @unique @db.Date
+  totalUsers    Int      @default(0)
+  activeUsers   Int      @default(0)
+  newUsers      Int      @default(0)
+  totalProducts Int      @default(0)
+  activeProducts Int     @default(0)
+  soldProducts  Int      @default(0)
+  totalChats    Int      @default(0)
+  totalMessages Int      @default(0)
+  totalReservations Int  @default(0)
+  totalFavorites Int     @default(0)
+  totalSearches Int      @default(0)
+  totalReports  Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([date])
+  @@map("analytics_daily_stats")
+}
+
+model AnalyticsEntityStats {
+  id         String              @id @default(uuid())
+  entityType AnalyticsEntityType
+  entityId   String
+  views      Int                 @default(0)
+  favorites  Int                 @default(0)
+  messages   Int                 @default(0)
+  reservations Int               @default(0)
+  reports   Int                 @default(0)
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+
+  @@unique([entityType, entityId])
+  @@index([entityType])
+  @@index([entityId])
+  @@map("analytics_entity_stats")
+}
+

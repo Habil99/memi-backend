@@ -3,6 +3,8 @@ import {
   NotFoundException,
   ForbiddenException,
   BadRequestException,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../../common/services/prisma.service';
@@ -11,10 +13,19 @@ import { UpdateProductDto } from '../dtos/update-product.dto';
 import { FilterProductsDto } from '../dtos/filter-products.dto';
 import { IProduct, IPaginatedProducts } from '../types/product.type';
 import { ProductStatus } from '../../../common/types';
+import { AnalyticsService } from '../../analytics/services/analytics.service';
+import {
+  AnalyticsEventType,
+  AnalyticsEntityType,
+} from '../../analytics/types/analytics-event.type';
 
 @Injectable()
 export class ProductsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @Inject(forwardRef(() => AnalyticsService))
+    private analyticsService: AnalyticsService,
+  ) {}
 
   async create(
     sellerId: string,
@@ -94,6 +105,16 @@ export class ProductsService {
             city: true,
           },
         },
+      },
+    });
+    this.analyticsService.trackEventAsync({
+      eventType: AnalyticsEventType.PRODUCT_CREATED,
+      userId: sellerId,
+      entityType: AnalyticsEntityType.PRODUCT,
+      entityId: product.id,
+      metadata: {
+        categoryId: createProductDto.categoryId,
+        price: Number(createProductDto.price),
       },
     });
     return this.mapProductToIProduct(product);
@@ -213,7 +234,11 @@ export class ProductsService {
     };
   }
 
-  async findById(id: string, userId?: string): Promise<IProduct> {
+  async findById(
+    id: string,
+    userId?: string,
+    request?: { ip?: string; userAgent?: string },
+  ): Promise<IProduct> {
     const product = await this.prisma.product.findUnique({
       where: { id },
       include: {
@@ -264,11 +289,21 @@ export class ProductsService {
       });
       isFavorite = !!favorite;
     }
-    return {
+    const result = {
       ...this.mapProductToIProduct(product),
       favoriteCount: product._count.favorites,
       isFavorite,
     };
+    this.analyticsService.trackEventAsync(
+      {
+        eventType: AnalyticsEventType.PRODUCT_VIEWED,
+        userId,
+        entityType: AnalyticsEntityType.PRODUCT,
+        entityId: id,
+      },
+      request,
+    );
+    return result;
   }
 
   async update(

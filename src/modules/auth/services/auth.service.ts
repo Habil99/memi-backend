@@ -2,6 +2,8 @@ import {
   Injectable,
   UnauthorizedException,
   ConflictException,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -11,6 +13,11 @@ import { RegisterDto } from '../dtos/register.dto';
 import { LoginDto } from '../dtos/login.dto';
 import { IAuthResponse } from '../types/auth-response.type';
 import { IJwtPayload } from '../strategies/jwt.strategy';
+import { AnalyticsService } from '../../analytics/services/analytics.service';
+import {
+  AnalyticsEventType,
+  AnalyticsEntityType,
+} from '../../analytics/types/analytics-event.type';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +25,8 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private configService: ConfigService,
+    @Inject(forwardRef(() => AnalyticsService))
+    private analyticsService: AnalyticsService,
   ) {}
 
   async register(registerDto: RegisterDto): Promise<IAuthResponse> {
@@ -48,20 +57,44 @@ export class AuthService {
       email: user.email,
       role: user.role,
     });
+    this.analyticsService.trackEventAsync({
+      eventType: AnalyticsEventType.USER_REGISTERED,
+      userId: user.id,
+      entityType: AnalyticsEntityType.USER,
+      entityId: user.id,
+    });
     return {
       ...tokens,
       user,
     };
   }
 
-  async login(loginDto: LoginDto): Promise<IAuthResponse> {
+  async login(
+    loginDto: LoginDto,
+    request?: { ip?: string; userAgent?: string },
+  ): Promise<IAuthResponse> {
     const user = await this.prisma.user.findUnique({
       where: { email: loginDto.email },
     });
     if (!user) {
+      this.analyticsService.trackEventAsync(
+        {
+          eventType: AnalyticsEventType.LOGIN_FAILED,
+          metadata: { email: loginDto.email },
+        },
+        request,
+      );
       throw new UnauthorizedException('Invalid credentials');
     }
     if (user.isBlocked) {
+      this.analyticsService.trackEventAsync(
+        {
+          eventType: AnalyticsEventType.LOGIN_FAILED,
+          userId: user.id,
+          metadata: { reason: 'blocked' },
+        },
+        request,
+      );
       throw new UnauthorizedException('User account is blocked');
     }
     const isPasswordValid = await bcrypt.compare(
@@ -69,12 +102,25 @@ export class AuthService {
       user.password,
     );
     if (!isPasswordValid) {
+      this.analyticsService.trackEventAsync(
+        {
+          eventType: AnalyticsEventType.LOGIN_FAILED,
+          userId: user.id,
+        },
+        request,
+      );
       throw new UnauthorizedException('Invalid credentials');
     }
     const tokens = await this.generateTokens({
       sub: user.id,
       email: user.email,
       role: user.role,
+    });
+    this.analyticsService.trackEventAsync({
+      eventType: AnalyticsEventType.USER_LOGGED_IN,
+      userId: user.id,
+      entityType: AnalyticsEntityType.USER,
+      entityId: user.id,
     });
     return {
       ...tokens,
@@ -114,6 +160,10 @@ export class AuthService {
       );
       return { accessToken: newAccessToken };
     } catch (error) {
+      this.analyticsService.trackEventAsync({
+        eventType: AnalyticsEventType.UNAUTHORIZED_ACTION_ATTEMPT,
+        userId: payload?.sub,
+      });
       throw new UnauthorizedException('Invalid refresh token');
     }
   }
